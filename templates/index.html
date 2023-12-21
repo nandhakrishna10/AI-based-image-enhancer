@@ -1,1 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Enhancement</title>
+    <style>
+        body {
+            background-image: url(static/bg-4.avif);   
+            background-size: cover; /* This will make the image cover the entire background */
+            background-repeat: no-repeat;
+            background-position: center;         
+            font-family: Arial, sans-serif;
+            margin: 0;
+            color: white;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: grid;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .wrapper {
+            background: rgba(255, 255, 255, 0);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0);
+        }
+        .drag-area {
+            border: 3px dashed #ccc;
+            border-radius: 5px;
+            padding: 60px;
+            text-align: center;
+            margin-bottom: 25px;
+            cursor: pointer;
+        }
+        .drag-area.dragover {
+            border-color: white;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-bottom: 15px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: black;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: lightgrey;
+        }
+        input:checked + .slider:before {
+            background-color: black;
+            transform: translateX(26px);
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .loader {
+            border: 5px solid white;
+            border-top: 5px solid gray;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .container {  
+            width: 1000px;  
+            height: 100px;  
+            border: 5px solid red;  
+            display: grid;  
+        }  
+        button {  
+            background-color:white;  
+            color: white;  
+            font-size: 15px;  
+            border: 3.5px solid black;
+            margin: auto;  
+            width: 125px;  
+            height: 30px; 
+            display: grid;
+        }  
+        
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="drag-area" id="drag-area">
+            <p style="color: white;">Drag and drop an image here or click to select a file </p>
+        </div>
+        <div class="toggle-container">
+            <span class="label-text" style="color: white;"> Enhance Low Light Image</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggle-switch">
+                <span class="slider"></span>
+            </label>
+            <span class="label-text" style="color: white;">Convert to Grayscale and Enhance</span>
+        </div>
+        <button id="enhance-button" style="color: black;">Enhance Image</button>
+    </div>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loader"></div>
+    </div>
+    <script>
+        const dragArea = document.getElementById('drag-area');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const enhanceButton = document.getElementById('enhance-button');
+        const toggleSwitch = document.getElementById('toggle-switch');
+        let uploadedImage = null;
 
+        function handleFiles(files) {
+            uploadedImage = files[0];
+            dragArea.textContent = `File selected: ${uploadedImage.name}`;
+        }
+
+        dragArea.addEventListener('dragover', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            dragArea.classList.add('dragover');
+        });
+
+        dragArea.addEventListener('dragleave', (event) => {
+            dragArea.classList.remove('dragover');
+        });
+
+        dragArea.addEventListener('drop', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            dragArea.classList.remove('dragover');
+            handleFiles(event.dataTransfer.files);
+        });
+
+        dragArea.addEventListener('click', () => {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.onchange = (e) => handleFiles(e.target.files);
+            fileInput.click();
+        });
+
+        enhanceButton.addEventListener('click', () => {
+            if (!uploadedImage) {
+                alert('Please select an image first.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('image', uploadedImage);
+            formData.append('enhancement_type', toggleSwitch.checked ? 'grayscale' : 'low_light');
+
+            loadingOverlay.style.display = 'flex';
+
+            fetch('/enhance', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                loadingOverlay.style.display = 'none';
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const downloadLink = document.createElement('a');
+                downloadLink.href = downloadUrl;
+                downloadLink.download = 'enhanced_image.png';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                window.URL.revokeObjectURL(downloadUrl);
+                document.body.removeChild(downloadLink);
+            })
+            .catch(() => {
+                loadingOverlay.style.display = 'none';
+                alert('An error occurred while enhancing the image.');
+            });
+        });
+
+        toggleSwitch.addEventListener('change', () => {
+            if (toggleSwitch.checked) {
+                // Change label text to 'Convert to Grayscale and Enhance'
+                dragArea.textContent = 'Convert to Grayscale and Enhance using Genetic Algorithm';
+            } else {
+                // Change label text to 'Enhance Low Light Image'
+                dragArea.textContent = 'Enhance Under-exposed Low Light Image using PSO Algorithm';
+            }
+        });
+    </script>
+</body>
+</html>
