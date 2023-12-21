@@ -1,35 +1,35 @@
-# Underwater-image-color-enhancement-with-PSO-python-implementation
+# Image Enhancement Software
 
-Implemented the research paper, [Natural-based underwater image color enhancement through fusion of swarm-intelligence algorithm](http://umpir.ump.edu.my/id/eprint/26347/) in python language. <br />
-### The Four steps strategy followed in NUCE method:
-- Superior based underwater color cast neutralization
-- Dual-intensity images fusion based on average of mean and median values
-- Swarm-intelligence based mean equalization
-- Unsharp masking
+This Image Enhancement Software is a versatile tool developed using Flask and DALL-E, providing advanced algorithms for enhancing images with superior quality. The software supports two enhancement types: Low Light and Grayscale.
 
-**Image credits**: [paper](http://umpir.ump.edu.my/id/eprint/26347/) <br />
-![](https://github.com/prashamsatalla/Underwater-image-color-enhancement-with-PSO-python-implementation/blob/main/NUCE_flowchart.png)
+## Features
 
-## User Guide
-- Clone this repository
-```commandline
-$ git clone https://github.com/prashamsatalla/Underwater-image-color-enhancement-with-PSO-python-implementation.git
-$ cd Underwater-image-color-enhancement-with-PSO-python-implementation
-```
-- Collect input images in **images** folder, then the enhanced output image will be saved in **results** folder with respective input image name.
-- Install required packages 
-```commandline
-$ pip install -r requirements.txt
-```
-- Run main.py .
-```commandline
-$ python main.py
-```
+- **Low Light Enhancement:** Improves under-exposed low light images using the PSO Algorithm.
+- **Grayscale Enhancement:** Converts images to grayscale and enhances them using the Genetic Algorithm.
+- **User-Friendly Interface:** Allows image upload through drag-and-drop or file selection.
+- **Toggle Switch:** Enables users to easily switch between enhancement types.
+- **Percentage Enhancement Display:** Shows the percentage of enhancement achieved based on the selected algorithm.
 
-### Code Result:
-![](https://github.com/prashamsatalla/Underwater-image-color-enhancement-with-PSO-python-implementation/blob/main/results/output.jpg)
+## Getting Started
 
-## Dependencies
-- OpenCV 3.4.8
-- NumPy
-- Matplotlib
+1. Clone the repository.
+2. Install dependencies using `pip install -r requirements.txt`.
+3. Run the application locally with `python main.py`.
+
+## Deployment
+
+The software can be deployed on various hosting platforms for easy accessibility.
+
+## Contribution
+
+Contributions are welcome! Please follow the guidelines in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- OpenAI for DALL-E.
+- Flask for the web framework.
+
